@@ -1,0 +1,89 @@
+package org.example.userservice.controller;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.example.userservice.common.response.ApiResponseWrapper;
+import org.example.userservice.dto.user.CreateUserDTO;
+import org.example.userservice.dto.user.UpdateUserDTO;
+import org.example.userservice.dto.user.UserVM;
+import org.example.userservice.service.IUserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RequiredArgsConstructor()
+@RestController
+@RequestMapping(path = "api/v1/user")
+public class UserController {
+    private final IUserService userService;
+
+
+    @GetMapping
+    public ResponseEntity<ApiResponseWrapper<List<UserVM>>> getAllUsers() {
+        ApiResponseWrapper<List<UserVM>> response = new ApiResponseWrapper<>(
+                HttpStatus.OK.value(),
+                "User retrieved successfully",
+                userService.getAllUsers()
+        );
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponseWrapper<UserVM>> getUserById(@PathVariable Long id) {
+        try {
+            UserVM user = userService.getUserById(id);
+            return ResponseEntity.ok(new ApiResponseWrapper<>(
+                    HttpStatus.OK.value(),
+                    "User retrieved successfully",
+                    user
+            ));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponseWrapper<>(HttpStatus.NOT_FOUND.value(), "User not found", null));
+        }
+    }
+
+    @PostMapping
+    public ResponseEntity<ApiResponseWrapper<UserVM>> createUser(@Valid @RequestBody CreateUserDTO createUserDTO) {
+        UserVM created = userService.createUser(createUserDTO);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ApiResponseWrapper<>(
+                        HttpStatus.CREATED.value(),
+                        "User created successfully",
+                        created
+                ));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponseWrapper<UserVM>> updateUser(@PathVariable Long id, @RequestBody UpdateUserDTO dto) {
+        try {
+            UserVM updated = userService.updateUser(id, dto);
+            return ResponseEntity.ok(new ApiResponseWrapper<>(
+                    HttpStatus.OK.value(),
+                    "User updated successfully",
+                    updated
+            ));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponseWrapper<>(HttpStatus.NOT_FOUND.value(), "User not found", null));
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponseWrapper<String>> deleteUser(@PathVariable Long id) {
+        try {
+            userService.deleteUser(id);
+            return ResponseEntity.ok(new ApiResponseWrapper<>(
+                    HttpStatus.OK.value(),
+                    "User deleted successfully",
+                    null
+            ));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponseWrapper<>(HttpStatus.NOT_FOUND.value(), "User not found", null));
+        }
+    }
+
+}
