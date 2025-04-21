@@ -9,6 +9,7 @@ import org.example.userservice.dto.user.UserVM;
 import org.example.userservice.service.IUserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,7 +19,6 @@ import java.util.List;
 @RequestMapping(path = "api/v1/user")
 public class UserController {
     private final IUserService userService;
-
 
     @GetMapping
     public ResponseEntity<ApiResponseWrapper<List<UserVM>>> getAllUsers() {
@@ -30,6 +30,7 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponseWrapper<UserVM>> getUserById(@PathVariable Long id) {
         try {
@@ -45,6 +46,7 @@ public class UserController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ApiResponseWrapper<UserVM>> createUser(@Valid @RequestBody CreateUserDTO createUserDTO) {
         UserVM created = userService.createUser(createUserDTO);
@@ -56,6 +58,7 @@ public class UserController {
                 ));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponseWrapper<UserVM>> updateUser(@PathVariable Long id, @RequestBody UpdateUserDTO dto) {
         try {
@@ -71,6 +74,7 @@ public class UserController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponseWrapper<String>> deleteUser(@PathVariable Long id) {
         try {
