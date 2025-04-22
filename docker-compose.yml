@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # Eureka Server
+  eureka-server:
+    image: eureka-server:latest
+    build:
+      context: ./eureka-server  # Đường dẫn đến thư mục chứa mã nguồn Eureka Server
+    ports:
+      - "8761:8761"  # Cổng cho Eureka Server
+    networks:
+      - app-network
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker  # Đảm bảo Eureka Server sử dụng profile Docker nếu có
+
+  # API Gateway
+  api-gateway:
+    image: api-gateway:latest
+    build:
+      context: ./api-gateway  # Đường dẫn đến thư mục chứa mã nguồn API Gateway
+    ports:
+      - "8080:8080"  # Cổng cho API Gateway
+    depends_on:
+      - eureka-server
+      - product-service
+      - user-service
+    networks:
+      - app-network
+    environment:
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka
+      - SPRING_PROFILES_ACTIVE=docker
+
+  # Product Service
+  product-service:
+    image: product-service:latest
+    build:
+      context: ./product-service  # Đường dẫn đến thư mục chứa mã nguồn Product Service
+    ports:
+      - "8082:8082"  # Cổng cho Product Service
+    depends_on:
+      - eureka-server
+    networks:
+      - app-network
+    environment:
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka
+      - SPRING_PROFILES_ACTIVE=docker
+
+  # User Service
+  user-service:
+    image: user-service:latest
+    build:
+      context: ./user-service  # Đường dẫn đến thư mục chứa mã nguồn User Service
+    ports:
+      - "8081:8081"  # Cổng cho User Service
+    depends_on:
+      - eureka-server
+    networks:
+      - app-network
+    environment:
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka
+      - SPRING_PROFILES_ACTIVE=docker
+
+networks:
+  app-network:
+    driver: bridge  # Tạo một mạng cầu nối (bridge) giữa các dịch vụ
+
