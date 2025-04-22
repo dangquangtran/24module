@@ -2,7 +2,7 @@ package org.example.userservice.config;
 
 
 import lombok.RequiredArgsConstructor;
-import org.example.userservice.security.JwtAuthenticationFilter;
+import org.example.userservice.security.CustomHeaderAuthenticationFilter;
 import org.example.userservice.security.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,17 +23,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthFilter;
+
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, CustomHeaderAuthenticationFilter customFilter) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll()
                 )
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
