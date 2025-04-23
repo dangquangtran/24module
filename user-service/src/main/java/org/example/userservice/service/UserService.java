@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Slf4j
 @RequiredArgsConstructor()
 @Service
 public class UserService implements IUserService{
@@ -28,6 +27,8 @@ public class UserService implements IUserService{
     private final PasswordEncoder passwordEncoder;
 
     public List<UserVM> getAllUsers() {
+        System.out.println(passwordEncoder.encode("string"));
+
         return userMapper.toVMList(userRepository.findAll());
     }
 

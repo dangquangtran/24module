@@ -33,17 +33,12 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponseWrapper<UserVM>> getUserById(@PathVariable Long id) {
-        try {
-            UserVM user = userService.getUserById(id);
-            return ResponseEntity.ok(new ApiResponseWrapper<>(
-                    HttpStatus.OK.value(),
-                    "User retrieved successfully",
-                    user
-            ));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponseWrapper<>(HttpStatus.NOT_FOUND.value(), "User not found", null));
-        }
+        UserVM user = userService.getUserById(id);
+        return ResponseEntity.ok(new ApiResponseWrapper<>(
+                HttpStatus.OK.value(),
+                "User retrieved successfully",
+                user
+        ));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -61,33 +56,23 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponseWrapper<UserVM>> updateUser(@PathVariable Long id, @RequestBody UpdateUserDTO dto) {
-        try {
-            UserVM updated = userService.updateUser(id, dto);
-            return ResponseEntity.ok(new ApiResponseWrapper<>(
-                    HttpStatus.OK.value(),
-                    "User updated successfully",
-                    updated
-            ));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponseWrapper<>(HttpStatus.NOT_FOUND.value(), "User not found", null));
-        }
+        UserVM updated = userService.updateUser(id, dto);
+        return ResponseEntity.ok(new ApiResponseWrapper<>(
+                HttpStatus.OK.value(),
+                "User updated successfully",
+                updated
+        ));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponseWrapper<String>> deleteUser(@PathVariable Long id) {
-        try {
-            userService.deleteUser(id);
-            return ResponseEntity.ok(new ApiResponseWrapper<>(
-                    HttpStatus.OK.value(),
-                    "User deleted successfully",
-                    null
-            ));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponseWrapper<>(HttpStatus.NOT_FOUND.value(), "User not found", null));
-        }
+        userService.deleteUser(id);
+        return ResponseEntity.ok(new ApiResponseWrapper<>(
+                HttpStatus.OK.value(),
+                "User deleted successfully",
+                null
+        ));
     }
 
 }

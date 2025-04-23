@@ -1,4 +1,4 @@
-package org.example.userservice.common.exception;
+package org.example.productservice.common.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
