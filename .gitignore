@@ -36,3 +36,7 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+# Bỏ qua tất cả log files trong bất kỳ thư mục con nào tên là "logs"
+**/logs/
+**/*.log

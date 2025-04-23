@@ -56,13 +56,13 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
-            System.out.println("Claims: " + claims);
+//            System.out.println("Claims: " + claims);
             String userId = String.valueOf(claims.get("userId", Long.class)); // userId là String trong JWT
             String role = claims.get("role", String.class);     // role cũng là String
             String username = claims.getSubject();
-            System.out.println("userId: " + userId);
-            System.out.println("role: " + role);
-            System.out.println("username: " + username);
+//            System.out.println("userId: " + userId);
+//            System.out.println("role: " + role);
+//            System.out.println("username: " + username);
             // Gắn thông tin vào header để các service phía sau sử dụng
             exchange = exchange.mutate()
                     .request(exchange.getRequest().mutate()

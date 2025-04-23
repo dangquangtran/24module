@@ -10,6 +10,7 @@ import org.example.productservice.entity.Product;
 import org.example.productservice.mapper.ProductMapper;
 import org.example.productservice.repository.CategoryRepository;
 import org.example.productservice.repository.ProductRepository;
+import org.slf4j.MDC;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -33,7 +34,8 @@ public class ProductService implements IProductService {
     public ProductVM getProductById(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
-        return productMapper.toProductVM(product);
+        ProductVM productVM = productMapper.toProductVM(product);
+        return productVM;
     }
 
     public ProductVM createProduct(CreateProductDTO dto) {
@@ -50,7 +52,6 @@ public class ProductService implements IProductService {
     public ProductVM updateProduct(Long id, UpdateProductDTO dto) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
-
         productMapper.updateProductFromDTO(dto, product);
         product.setUpdatedAt(LocalDateTime.now());
         product.setCategory(categoryRepository.findById(dto.getCategoryId())
