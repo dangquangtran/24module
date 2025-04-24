@@ -1,5 +1,6 @@
 package org.example.productservice.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.productservice.dto.product.CreateProductDTO;
@@ -7,6 +8,7 @@ import org.example.productservice.dto.product.UpdateProductDTO;
 import org.example.productservice.dto.product.ProductVM;
 import org.example.productservice.service.IProductService;
 import org.example.productservice.common.response.ApiResponseWrapper;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Locale;
 
 @RequiredArgsConstructor
 @RestController
@@ -35,7 +38,8 @@ public class ProductController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponseWrapper<ProductVM>> getProductById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponseWrapper<ProductVM>> getProductById(@PathVariable Long id, HttpServletRequest request) {
+        Locale locale = request.getLocale();
         ProductVM product = productService.getProductById(id);
         return ResponseEntity.ok(new ApiResponseWrapper<>(
                 HttpStatus.OK.value(),

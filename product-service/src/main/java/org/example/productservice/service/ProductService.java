@@ -1,11 +1,12 @@
 package org.example.productservice.service;
 
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.example.productservice.common.exception.ResourceNotFoundException;
 import org.example.productservice.dto.product.CreateProductDTO;
 import org.example.productservice.dto.product.UpdateProductDTO;
 import org.example.productservice.dto.product.ProductVM;
-import org.example.productservice.entity.Category;
 import org.example.productservice.entity.Product;
 import org.example.productservice.mapper.ProductMapper;
 import org.example.productservice.repository.CategoryRepository;
@@ -14,12 +15,14 @@ import org.slf4j.MDC;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Service
 public class ProductService implements IProductService {
     private final ProductRepository productRepository;
@@ -33,7 +36,7 @@ public class ProductService implements IProductService {
     @Cacheable(value = "products", key = "#id")
     public ProductVM getProductById(Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Not found"));
         ProductVM productVM = productMapper.toProductVM(product);
         return productVM;
     }
