@@ -1,0 +1,33 @@
+<configuration>
+
+    <!-- Cấu hình appender cho file -->
+    <appender name="ACCESS_LOG" class="ch.qos.logback.core.FileAppender">
+        <file>api-gateway/logs/access_log.log</file>
+        <append>true</append>
+        <encoder>
+            <!-- Cấu hình pattern cho log -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Cấu hình appender cho console -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <!-- Cấu hình pattern cho log xuất hiện trên console -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Cấu hình logger cho CommonsRequestLoggingFilter để log vào cả file và console -->
+    <logger name="org.springframework.web.filter.CommonsRequestLoggingFilter" level="DEBUG" additivity="false">
+        <appender-ref ref="ACCESS_LOG" />
+        <appender-ref ref="CONSOLE" />
+    </logger>
+
+    <!-- Cấu hình root logger để log vào console -->
+    <root level="DEBUG">
+        <appender-ref ref="ACCESS_LOG" />
+        <appender-ref ref="CONSOLE" />
+    </root>
+
+</configuration>
