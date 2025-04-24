@@ -1,10 +1,9 @@
-package org.example.userservice.dto.user;
+package org.example.commonlibrary.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.userservice.entity.Role;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -13,7 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserVM {
+public class UserVM implements Serializable {
     private Long id;
     private String username;
     private String email;

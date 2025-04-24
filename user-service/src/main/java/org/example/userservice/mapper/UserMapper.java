@@ -15,4 +15,5 @@ public interface UserMapper {
     User toUser(CreateUserDTO dto);
     void updateUserFromDTO(UpdateUserDTO dto, @MappingTarget User user);
     List<UserVM> toVMList(List<User> users);
+    org.example.commonlibrary.dto.UserVM toUserVMDubbo(User user);
 }
