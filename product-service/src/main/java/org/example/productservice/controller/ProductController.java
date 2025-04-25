@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
 @RestController
@@ -38,9 +39,8 @@ public class ProductController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponseWrapper<ProductVM>> getProductById(@PathVariable Long id, HttpServletRequest request) {
-        Locale locale = request.getLocale();
-        ProductVM product = productService.getProductById(id);
+    public ResponseEntity<ApiResponseWrapper<ProductVM>> getProductById(@PathVariable Long id) {
+        ProductVM product = productService.getProductById(id).join();
         return ResponseEntity.ok(new ApiResponseWrapper<>(
                 HttpStatus.OK.value(),
                 "Product retrieved successfully",

@@ -1,5 +1,10 @@
 package org.example.productservice.service;
 
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
+import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @AllArgsConstructor
 @Service
@@ -33,12 +39,25 @@ public class ProductService implements IProductService {
         return productMapper.toVMList(productRepository.findAll());
     }
 
-    @Cacheable(value = "products", key = "#id")
-    public ProductVM getProductById(Long id) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Not found"));
-        ProductVM productVM = productMapper.toProductVM(product);
-        return productVM;
+    @CircuitBreaker(name = "backendA", fallbackMethod = "fallbackMethod")
+    @Retry(name = "backendA", fallbackMethod = "fallbackMethod")
+    @RateLimiter(name = "backendA", fallbackMethod = "fallbackMethod")
+    @Bulkhead(name = "backendA", fallbackMethod = "fallbackMethod")
+    @TimeLimiter(name = "backendA", fallbackMethod = "fallbackMethod")
+    public CompletableFuture<ProductVM> getProductById(Long id) {
+        return CompletableFuture.supplyAsync(() -> {
+            Product product = productRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Not found"));
+            return productMapper.toProductVM(product);
+        });
+    }
+
+    public CompletableFuture<ProductVM> fallbackMethod(Long id, Throwable t) {
+        ProductVM fallback = new ProductVM();
+        fallback.setId(id);
+        fallback.setName("Fallback async");
+        fallback.setDescription("Timeout hoặc lỗi hệ thống: " + t.getMessage());
+        return CompletableFuture.completedFuture(fallback);
     }
 
     public ProductVM createProduct(CreateProductDTO dto) {
