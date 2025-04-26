@@ -35,6 +35,9 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
         if (path.startsWith("/user-service/api/v1/auth/login") && method.equals("POST")) {
             return chain.filter(exchange);
         }
+        if (path.startsWith("/user-service/api/v1/user/register") && method.equals("POST")) {
+            return chain.filter(exchange);
+        }
         if (path.startsWith("/product-service/api/v1/product") && method.equals("GET") && !path.contains("/product-service/api/v1/product/")) {
             return chain.filter(exchange);
         }

@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.userservice.common.response.ApiResponseWrapper;
 import org.example.userservice.dto.user.CreateUserDTO;
+import org.example.userservice.dto.user.RegisterRequestDTO;
 import org.example.userservice.dto.user.UpdateUserDTO;
 import org.example.userservice.dto.user.UserVM;
 import org.example.userservice.service.IUserService;
@@ -49,6 +50,17 @@ public class UserController {
                 .body(new ApiResponseWrapper<>(
                         HttpStatus.CREATED.value(),
                         "User created successfully",
+                        created
+                ));
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<ApiResponseWrapper<UserVM>> registerUser(@Valid @RequestBody RegisterRequestDTO registerRequestDTO) {
+        UserVM created = userService.registerUser(registerRequestDTO);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ApiResponseWrapper<>(
+                        HttpStatus.CREATED.value(),
+                        "Register successfully",
                         created
                 ));
     }

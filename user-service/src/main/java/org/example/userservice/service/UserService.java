@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.userservice.dto.user.CreateUserDTO;
+import org.example.userservice.dto.user.RegisterRequestDTO;
 import org.example.userservice.dto.user.UpdateUserDTO;
 import org.example.userservice.dto.user.UserVM;
 import org.example.userservice.entity.Role;
@@ -43,6 +44,18 @@ public class UserService implements IUserService{
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
         return userMapper.toUserVM(user);
+    }
+
+    public UserVM registerUser(RegisterRequestDTO dto) {
+        User user = userMapper.toUser(dto);
+        String encodedPassword = passwordEncoder.encode(dto.getPassword());
+        user.setPassword(encodedPassword);
+        user.setStatus(true);
+        user.setCreatedAt(LocalDateTime.now());
+        user.setRole(Role.CUSTOMER);
+        User saved = userRepository.save(user);
+        sendDiscordNotification(dto.getUsername(), LocalDateTime.now().toString());
+        return userMapper.toUserVM(saved);
     }
 
     public UserVM createUser(CreateUserDTO dto) {

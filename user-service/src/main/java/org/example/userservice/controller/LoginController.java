@@ -12,18 +12,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-@RequestMapping("/api/v1/auth")
-@RequiredArgsConstructor
-public class LoginController {
-    private final ILoginService loginService;
-    @PostMapping("/login")
-    public ResponseEntity<ApiResponseWrapper<String>> authenticateUser(@Valid @RequestBody LoginRequestDTO loginRequest) {
-        ApiResponseWrapper<String> response = new ApiResponseWrapper<>(
-                HttpStatus.OK.value(),
-                "Login successfully",
-                loginService.authenticateUser(loginRequest)
-        );
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-}
+        @RestController
+        @RequestMapping("/api/v1/auth")
+        @RequiredArgsConstructor
+        public class LoginController {
+            private final ILoginService loginService;
+            @PostMapping("/login")
+            public ResponseEntity<ApiResponseWrapper<String>> authenticateUser(@Valid @RequestBody LoginRequestDTO loginRequest) {
+                ApiResponseWrapper<String> response = new ApiResponseWrapper<>(
+                        HttpStatus.OK.value(),
+                        "Login successfully",
+                        loginService.authenticateUser(loginRequest)
+                );
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            }
+        }
