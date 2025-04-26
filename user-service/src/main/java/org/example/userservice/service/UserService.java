@@ -1,12 +1,11 @@
 package org.example.userservice.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.userservice.dto.user.CreateUserDTO;
-import org.example.userservice.dto.user.RegisterRequestDTO;
-import org.example.userservice.dto.user.UpdateUserDTO;
-import org.example.userservice.dto.user.UserVM;
+import org.example.userservice.dto.user.*;
 import org.example.userservice.entity.Role;
 import org.example.userservice.entity.User;
 import org.example.userservice.mapper.UserMapper;
@@ -14,6 +13,7 @@ import org.example.userservice.repository.UserRepository;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -32,6 +32,7 @@ public class UserService implements IUserService{
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final RestTemplate restTemplate;
+    private final StreamBridge streamBridge;
 
     public List<UserVM> getAllUsers() {
         System.out.println(passwordEncoder.encode("string"));
@@ -55,6 +56,14 @@ public class UserService implements IUserService{
         user.setRole(Role.CUSTOMER);
         User saved = userRepository.save(user);
         sendDiscordNotification(dto.getUsername(), LocalDateTime.now().toString());
+        try {
+        MyMessage message = new MyMessage(dto.getUsername(), "User registered at: " + LocalDateTime.now());
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonMessage = objectMapper.writeValueAsString(message);
+        streamBridge.send("outputChannel-out-0", jsonMessage);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
         return userMapper.toUserVM(saved);
     }
 
