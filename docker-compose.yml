@@ -108,7 +108,7 @@ services:
     networks:
       - kafka-net
     ports:
-      - "8080:8080"
+      - "8070:8070"
 
   vault:
     image: hashicorp/vault:latest

@@ -171,6 +171,17 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>io.temporal</groupId>
+            <artifactId>temporal-sdk</artifactId>
+            <version>1.28.3</version>
+        </dependency>
+        <dependency>
+            <groupId>io.temporal</groupId>
+            <artifactId>temporal-spring-boot-starter</artifactId>
+            <version>1.28.3</version>
+        </dependency>
+
     </dependencies>
 
     <build>
