@@ -48,6 +48,13 @@ public class UserService implements IUserService{
     }
 
     public UserVM registerUser(RegisterRequestDTO dto) {
+        if (userRepository.existsByUsername((dto.getUsername()))) {
+            throw new RuntimeException("Username already exists");
+        }
+
+        if (userRepository.existsByEmail((dto.getEmail()))) {
+            throw new RuntimeException("Email already exists");
+        }
         User user = userMapper.toUser(dto);
         String encodedPassword = passwordEncoder.encode(dto.getPassword());
         user.setPassword(encodedPassword);
@@ -68,11 +75,17 @@ public class UserService implements IUserService{
     }
 
     public UserVM createUser(CreateUserDTO dto) {
+        if (userRepository.existsByUsername((dto.getUsername()))) {
+            throw new RuntimeException("Username already exists");
+        }
+
+        if (userRepository.existsByEmail((dto.getEmail()))) {
+            throw new RuntimeException("Email already exists");
+        }
         User user = userMapper.toUser(dto);
         String encodedPassword = passwordEncoder.encode(dto.getPassword());
         user.setPassword(encodedPassword);
         user.setStatus(true);
-        user.setCreatedAt(LocalDateTime.now());
         User saved = userRepository.save(user);
         sendDiscordNotification(dto.getUsername(), LocalDateTime.now().toString());
         return userMapper.toUserVM(saved);
@@ -118,7 +131,6 @@ public class UserService implements IUserService{
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
 
         userMapper.updateUserFromDTO(dto, user);
-        user.setUpdatedAt(LocalDateTime.now());
         User updated = userRepository.save(user);
         return userMapper.toUserVM(updated);
     }

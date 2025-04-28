@@ -67,7 +67,7 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponseWrapper<UserVM>> updateUser(@PathVariable Long id, @RequestBody UpdateUserDTO dto) {
+    public ResponseEntity<ApiResponseWrapper<UserVM>> updateUser(@Valid @PathVariable Long id, @RequestBody UpdateUserDTO dto) {
         UserVM updated = userService.updateUser(id, dto);
         return ResponseEntity.ok(new ApiResponseWrapper<>(
                 HttpStatus.OK.value(),

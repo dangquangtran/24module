@@ -50,7 +50,7 @@ public class ProductController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<ApiResponseWrapper<ProductVM>> createProduct(@Validated @RequestBody CreateProductDTO createProductDTO) {
+    public ResponseEntity<ApiResponseWrapper<ProductVM>> createProduct(@Valid @RequestBody CreateProductDTO createProductDTO) {
         ProductVM createdProduct = productService.createProduct(createProductDTO);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponseWrapper<>(
@@ -62,7 +62,7 @@ public class ProductController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponseWrapper<ProductVM>> updateProduct(@PathVariable Long id, @RequestBody UpdateProductDTO updateProductDTO) {
+    public ResponseEntity<ApiResponseWrapper<ProductVM>> updateProduct(@Valid @PathVariable Long id, @RequestBody UpdateProductDTO updateProductDTO) {
         ProductVM updatedProduct = productService.updateProduct(id, updateProductDTO);
         return ResponseEntity.ok(new ApiResponseWrapper<>(
                 HttpStatus.OK.value(),

@@ -22,4 +22,6 @@ public class UserVM {
     private LocalDateTime updatedAt;
     private Role role;
     private Boolean status;
+    private String createdBy;
+    private String lastModifiedBy;
 }
