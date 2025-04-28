@@ -1,7 +1,6 @@
 package org.example.productservice.dto.product;
 
 import lombok.Data;
-import org.example.productservice.dto.category.CategoryVM;
 import org.example.productservice.entity.Category;
 
 import java.time.LocalDateTime;
