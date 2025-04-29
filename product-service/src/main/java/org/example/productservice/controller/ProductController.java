@@ -30,6 +30,16 @@ public class ProductController {
         ));
     }
 
+    @GetMapping("/active")
+    public ResponseEntity<ApiResponseWrapper<List<ProductVM>>> getAllActiveProducts() {
+        List<ProductVM> products = productHandler.getAllActiveProducts();
+        return ResponseEntity.ok(new ApiResponseWrapper<>(
+                HttpStatus.OK.value(),
+                "Products retrieved successfully",
+                products
+        ));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponseWrapper<ProductVM>> getProductById(@PathVariable Long id) {
         ProductVM product = productHandler.getProductById(id);

@@ -16,6 +16,7 @@ import org.example.productservice.repository.CategoryRepository;
 import org.example.productservice.repository.ProductRepository;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -36,6 +37,14 @@ public class ProductService implements IProductService {
     }
 
     @Override
+    public List<Product> getAllActiveProducts() {
+        return productRepository.findAll().stream()
+                .filter(Product::getStatus)
+                .toList();
+    }
+
+    @Override
+    @Cacheable(value = "products", key = "#id")
     @CircuitBreaker(name = "backendA", fallbackMethod = "fallbackMethod")
     @Retry(name = "backendA", fallbackMethod = "fallbackMethod")
     @RateLimiter(name = "backendA", fallbackMethod = "fallbackMethod")

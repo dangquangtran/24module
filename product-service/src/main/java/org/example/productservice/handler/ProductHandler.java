@@ -28,6 +28,11 @@ public class ProductHandler implements IProductHandler {
         return productMapper.toVMList(products);
     }
 
+    public List<ProductVM> getAllActiveProducts() {
+        List<Product> products = productService.getAllActiveProducts();
+        return productMapper.toVMList(products);
+    }
+
     public ProductVM getProductById(Long id) {
         Product product = productService.getProductById(id).join();
         return productMapper.toProductVM(product);

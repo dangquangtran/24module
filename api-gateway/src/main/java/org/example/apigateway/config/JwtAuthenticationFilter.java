@@ -41,7 +41,9 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
         if (path.startsWith("/product-service/api/v1/product") && method.equals("GET") && !path.contains("/product-service/api/v1/product/")) {
             return chain.filter(exchange);
         }
-
+        if (path.equals("/product-service/api/v1/product/active") && method.equals("GET")) {
+            return chain.filter(exchange);
+        }
         if (path.startsWith("/v3/api-docs") || path.startsWith("/swagger-ui")
                 || path.startsWith("/user-service/v3/api-docs")|| path.startsWith("/product-service/v3/api-docs")) {
             return chain.filter(exchange);

@@ -16,4 +16,6 @@ public interface IProductHandler {
     ProductVM updateProduct(Long id, UpdateProductDTO updateProductDTO);
 
     void deleteProduct(Long id);
+
+    List<ProductVM> getAllActiveProducts();
 }
