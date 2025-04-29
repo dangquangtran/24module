@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/v1/login-dubbo")
 public class LoginController {
     @DubboReference
     private IUserServiceDubbo userServiceDubbo;
 
-    @PostMapping("/login")
+    @PostMapping()
     public ResponseEntity<UserVM> login(@RequestBody LoginRequestDTO dto) {
         UserVM result = userServiceDubbo.login(dto);
         return ResponseEntity.ok(result);

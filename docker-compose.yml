@@ -126,6 +126,15 @@ services:
     command: vault server -config=/vault/config/vault.hcl
     networks:
       - kafka-net
+
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    restart: always
+    ports:
+      - "9412:9411"
+    networks:
+      - kafka-net
 networks:
   kafka-net:
     driver: bridge
