@@ -3,6 +3,7 @@ package org.example.productservice.common.exception;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.example.productservice.dto.error.ErrorResponse;
+import org.example.productservice.util.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
@@ -43,7 +44,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException ex
             , HttpServletRequest request) {
         Locale locale = request.getLocale();
-        String errorMessage = messageSource.getMessage("error.notfound", null, locale);
+        String errorMessage = messageSource.getMessage(Constant.ERROR_NOT_FOUND, null, locale);
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), errorMessage);
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }

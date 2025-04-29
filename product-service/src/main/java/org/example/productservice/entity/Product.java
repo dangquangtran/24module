@@ -1,9 +1,7 @@
 package org.example.productservice.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -11,6 +9,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Data
 @Entity
+@Builder
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
