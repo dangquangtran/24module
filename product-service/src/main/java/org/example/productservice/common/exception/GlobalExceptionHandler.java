@@ -2,7 +2,7 @@ package org.example.productservice.common.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
-import org.example.productservice.dto.error.ErrorResponse;
+import org.example.productservice.common.response.ErrorResponse;
 import org.example.productservice.util.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -20,15 +20,20 @@ import java.util.Map;
 @RestControllerAdvice
 @AllArgsConstructor
 public class GlobalExceptionHandler {
-    @Autowired
-    private MessageSource messageSource;
+    private final MessageSource messageSource;
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(
+            MethodArgumentNotValidException ex,
+            HttpServletRequest request) {
+
+        Locale locale = request.getLocale();
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
+            String errorMessage = messageSource.getMessage("error.validation.field",
+                    new Object[]{fieldName}, locale);
             errors.put(fieldName, errorMessage);
         });
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
@@ -36,15 +41,18 @@ public class GlobalExceptionHandler {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<?> handleRuntimeException(RuntimeException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException ex, HttpServletRequest request) {
+        String errorMessage = ex.getMessage();
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), errorMessage);
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
+
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException ex
             , HttpServletRequest request) {
         Locale locale = request.getLocale();
-        String errorMessage = messageSource.getMessage(Constant.ERROR_NOT_FOUND, null, locale);
+        String errorMessage = messageSource.getMessage(Constant.ERROR_PRODUCT_NOT_FOUND, null, locale);
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), errorMessage);
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }

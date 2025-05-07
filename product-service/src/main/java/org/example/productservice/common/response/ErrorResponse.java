@@ -1,4 +1,4 @@
-package org.example.productservice.dto.error;
+package org.example.productservice.common.response;
 
 import lombok.Data;
 

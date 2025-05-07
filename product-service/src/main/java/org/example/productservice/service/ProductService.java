@@ -17,10 +17,13 @@ import org.example.productservice.repository.ProductRepository;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
 @AllArgsConstructor
@@ -53,8 +56,7 @@ public class ProductService implements IProductService {
     public CompletableFuture<Product> getProductById(Long id) {
         return CompletableFuture.supplyAsync(() ->
                 productRepository.findById(id)
-                        .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id))
-        );
+                        .orElseThrow(() -> new ResourceNotFoundException("Product not found")));
     }
 
     public CompletableFuture<Product> fallbackMethod(Long id, Throwable t) {
@@ -71,7 +73,7 @@ public class ProductService implements IProductService {
         product.setCreatedAt(LocalDateTime.now());
         product.setStatus(true);
         product.setCategory(categoryRepository.findById(dto.getCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + dto.getCategoryId())));
+                .orElseThrow(() -> new ResourceNotFoundException("error.category.notfound")));
         return productRepository.save(product);
     }
 
@@ -79,11 +81,11 @@ public class ProductService implements IProductService {
     @CachePut(value = "products", key = "#id")
     public Product updateProduct(Long id, UpdateProductDTO dto) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("error.product.notfound"));
         productMapper.updateProductFromDTO(dto, product);
         product.setUpdatedAt(LocalDateTime.now());
         product.setCategory(categoryRepository.findById(dto.getCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + dto.getCategoryId())));
+                .orElseThrow(() -> new ResourceNotFoundException("error.category.notfound")));
         return productRepository.save(product);
     }
 
@@ -92,7 +94,7 @@ public class ProductService implements IProductService {
     @Transactional
     public void deleteProduct(Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("error.product.notfound"));
         productRepository.delete(product);
     }
 }

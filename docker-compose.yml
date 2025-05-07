@@ -98,17 +98,29 @@ services:
       - "9092:9092"
       - "9093:9093"
 
-  kafka-ui:
-    image: provectuslabs/kafka-ui:latest
-    container_name: kafka-ui
+#  kafka-ui:
+#    image: provectuslabs/kafka-ui:latest
+#    container_name: kafka-ui
+#    restart: always
+#    environment:
+#      KAFKA_CLUSTERS_0_NAME: local
+#      KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS: kafka:9093
+#    networks:
+#      - kafka-net
+#    ports:
+#      - "8070:8070"
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop:latest
+    container_name: kafdrop
     restart: always
     environment:
-      KAFKA_CLUSTERS_0_NAME: local
-      KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS: kafka:9093
+      KAFKA_BROKERCONNECT: kafka:9093
+      KAFKA_LISTENER_NAME: INSIDE
+    ports:
+      - "9000:9000"
     networks:
       - kafka-net
-    ports:
-      - "8070:8070"
 
   vault:
     image: hashicorp/vault:latest
