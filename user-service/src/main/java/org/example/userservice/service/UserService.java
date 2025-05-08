@@ -35,8 +35,6 @@ public class UserService implements IUserService{
     private final StreamBridge streamBridge;
 
     public List<UserVM> getAllUsers() {
-        System.out.println(passwordEncoder.encode("string"));
-
         return userMapper.toVMList(userRepository.findAll());
     }
 

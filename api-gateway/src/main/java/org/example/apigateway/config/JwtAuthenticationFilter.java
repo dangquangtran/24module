@@ -17,7 +17,7 @@ import java.nio.charset.StandardCharsets;
 
 @Component
 @RequiredArgsConstructor
-public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
+public class    JwtAuthenticationFilter implements GlobalFilter, Ordered {
 
     @Value("${jwt.secret-key}")
     private String secretKey;

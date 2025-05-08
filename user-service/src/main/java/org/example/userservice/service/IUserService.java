@@ -8,7 +8,8 @@ import org.example.userservice.dto.user.UserVM;
 import java.util.List;
 
 public interface IUserService{
-    List<UserVM> getAllUsers();
+    List<UserVM>
+    getAllUsers();
     UserVM getUserById(Long id);
     UserVM createUser(CreateUserDTO dto);
     UserVM updateUser(Long id, UpdateUserDTO dto);

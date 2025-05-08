@@ -65,7 +65,6 @@
 #    driver: bridge  # Tạo một mạng cầu nối (bridge) giữa các dịch vụ
 #
 
-version: '3.8'
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.0
@@ -97,18 +96,6 @@ services:
     ports:
       - "9092:9092"
       - "9093:9093"
-
-#  kafka-ui:
-#    image: provectuslabs/kafka-ui:latest
-#    container_name: kafka-ui
-#    restart: always
-#    environment:
-#      KAFKA_CLUSTERS_0_NAME: local
-#      KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS: kafka:9093
-#    networks:
-#      - kafka-net
-#    ports:
-#      - "8070:8070"
 
   kafdrop:
     image: obsidiandynamics/kafdrop:latest
@@ -178,6 +165,56 @@ services:
       - kafka-net
     depends_on:
       - redis
+
+  temporal:
+    image: temporalio/auto-setup:latest
+    container_name: temporal
+    restart: always
+    environment:
+      - DB=postgres12
+      - DB_PORT=5432
+      - POSTGRES_USER=temporal
+      - POSTGRES_PWD=temporal
+      - POSTGRES_SEEDS=temporal-postgres
+      - TEMPORAL_ADDRESS=temporal:7233
+    ports:
+      - "7233:7233"
+    depends_on:
+      - temporal-postgres
+    networks:
+      - kafka-net
+
+  temporal-postgres:
+    image: postgres:17
+    container_name: temporal-postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=temporal
+      - POSTGRES_PASSWORD=temporal
+      - POSTGRES_DB=temporal
+    ports:
+      - "5432:5432"
+    networks:
+      - kafka-net
+    volumes:
+      - temporal-postgres-data:/var/lib/postgresql/data
+
+  temporal-ui:
+    image: temporalio/ui:latest
+    container_name: temporal-ui
+    restart: always
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+    ports:
+      - "8088:8080"
+    depends_on:
+      - temporal
+    networks:
+      - kafka-net
+
 networks:
   kafka-net:
     driver: bridge
+
+volumes:
+  temporal-postgres-data:
