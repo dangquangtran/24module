@@ -1,71 +1,37 @@
 #version: '3.8'
 #
-#services:
-#  # Eureka Server
-#  eureka-server:
-#    image: eureka-server:latest
-#    build:
-#      context: ./eureka-server  # Đường dẫn đến thư mục chứa mã nguồn Eureka Server
-#    ports:
-#      - "8761:8761"  # Cổng cho Eureka Server
-#    networks:
-#      - app-network
-#    environment:
-#      - SPRING_PROFILES_ACTIVE=docker  # Đảm bảo Eureka Server sử dụng profile Docker nếu có
-#
-#  # API Gateway
-#  api-gateway:
-#    image: api-gateway:latest
-#    build:
-#      context: ./api-gateway  # Đường dẫn đến thư mục chứa mã nguồn API Gateway
-#    ports:
-#      - "8080:8080"  # Cổng cho API Gateway
-#    depends_on:
-#      - eureka-server
-#      - product-service
-#      - user-service
-#    networks:
-#      - app-network
-#    environment:
-#      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka
-#      - SPRING_PROFILES_ACTIVE=docker
-#
-#  # Product Service
-#  product-service:
-#    image: product-service:latest
-#    build:
-#      context: ./product-service  # Đường dẫn đến thư mục chứa mã nguồn Product Service
-#    ports:
-#      - "8082:8082"  # Cổng cho Product Service
-#    depends_on:
-#      - eureka-server
-#    networks:
-#      - app-network
-#    environment:
-#      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka
-#      - SPRING_PROFILES_ACTIVE=docker
-#
-#  # User Service
-#  user-service:
-#    image: user-service:latest
-#    build:
-#      context: ./user-service  # Đường dẫn đến thư mục chứa mã nguồn User Service
-#    ports:
-#      - "8081:8081"  # Cổng cho User Service
-#    depends_on:
-#      - eureka-server
-#    networks:
-#      - app-network
-#    environment:
-#      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka
-#      - SPRING_PROFILES_ACTIVE=docker
-#
-#networks:
-#  app-network:
-#    driver: bridge  # Tạo một mạng cầu nối (bridge) giữa các dịch vụ
-#
-
 services:
+  
+  postgres:
+    container_name: postgres
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5433:5432"
+    networks:
+      - kafka-net
+    restart: unless-stopped
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    networks:
+      - kafka-net
+    restart: unless-stopped
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.0
     container_name: zookeeper
@@ -212,9 +178,83 @@ services:
     networks:
       - kafka-net
 
+  # Eureka Server
+  eureka-server:
+    container_name: eureka-server
+    image: eureka-server:latest
+    build:
+      context: .
+      dockerfile: eureka-server/Dockerfile
+    ports:
+      - "8761:8761"
+    networks:
+      - kafka-net
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  # API Gateway
+  api-gateway:
+    container_name: api-gateway
+    image: api-gateway:latest
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    ports:
+      - "8090:8080"
+    depends_on:
+      - eureka-server
+      - product-service
+      - user-service
+    networks:
+      - kafka-net
+    environment:
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka
+      - SPRING_PROFILES_ACTIVE=docker
+
+  # Product Service
+  product-service:
+    container_name: product-service
+    image: product-service:latest
+    build:
+      context: .
+      dockerfile: product-service/Dockerfile
+    ports:
+      - "8082:8082"
+    depends_on:
+      - eureka-server
+      - postgres
+      - redis
+      - kafka
+    networks:
+      - kafka-net
+    environment:
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka
+      - SPRING_PROFILES_ACTIVE=docker
+
+  # User Service
+  user-service:
+    container_name: user-service
+    image: user-service:latest
+    build:
+      context: .
+      dockerfile: user-service/Dockerfile
+    ports:
+      - "8081:8081"
+    depends_on:
+      - eureka-server
+      - postgres
+      - redis
+      - kafka
+    networks:
+      - kafka-net
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
 networks:
   kafka-net:
     driver: bridge
 
 volumes:
   temporal-postgres-data:
+  postgres:
+  pgadmin:

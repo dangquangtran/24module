@@ -2,6 +2,7 @@ package org.example.userservice.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,10 +11,12 @@ import org.example.userservice.entity.Role;
 import org.example.userservice.entity.User;
 import org.example.userservice.mapper.UserMapper;
 import org.example.userservice.repository.UserRepository;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -25,6 +28,7 @@ import org.springframework.web.client.RestTemplate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor()
 @Service
 public class UserService implements IUserService{
@@ -35,6 +39,8 @@ public class UserService implements IUserService{
     private final StreamBridge streamBridge;
 
     public List<UserVM> getAllUsers() {
+        String encodedPassword = passwordEncoder.encode("admin");
+        log.info("Encoded password: {}", encodedPassword);
         return userMapper.toVMList(userRepository.findAll());
     }
 
