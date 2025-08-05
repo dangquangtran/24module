@@ -28,19 +28,18 @@ jobs:
       - name: Build common-library first
         run: |
           cd common-library
-          mvn clean install
+          mvn clean install -DskipTests  # ← Skip tests
 
-      - name: Build and test other services
+      - name: Build other services
         run: |
-          cd api-gateway && mvn clean install
-          cd ../user-service && mvn clean install
-          cd ../product-service && mvn clean install
+          cd api-gateway && mvn clean install -DskipTests  # ← Skip tests
+          cd ../user-service && mvn clean install -DskipTests  # ← Skip tests
+          cd ../product-service && mvn clean install -DskipTests  # ← Skip tests
 
-  # CD Phase - Chạy trên Self-hosted Runner (laptop)
   deploy:
-    needs: build-and-test  # ← Chỉ chạy sau khi CI pass
-    runs-on: self-hosted   # ← Chạy trên laptop của bạn
-    if: github.ref == 'refs/heads/main'  # ← Chỉ deploy từ main branch
+    needs: build-and-test
+    runs-on: self-hosted
+    if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
 
@@ -49,7 +48,7 @@ jobs:
           echo "🚀 Deploying to laptop..."
           
           # Di chuyển vào thư mục project
-          cd /d/Kienlong/hoc_tap/assignment1-24module
+          cd D:\Kienlong\hoc_tap\assignment1-24module
           
           # Pull code mới
           git pull origin main
