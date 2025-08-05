@@ -1,0 +1,86 @@
+name: Microservices CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # CI Phase - Chạy trên GitHub server
+  build-and-test:
+    runs-on: ubuntu-latest  # ← Giữ nguyên GitHub server
+    strategy:
+      matrix:
+        service: [common-library, api-gateway, user-service, product-service]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Build and Test ${{ matrix.service }}
+        run: |
+          cd ${{ matrix.service }}
+          mvn clean install
+
+  # CD Phase - Chạy trên Self-hosted Runner (laptop)
+  deploy:
+    needs: build-and-test  # ← Chỉ chạy sau khi CI pass
+    runs-on: self-hosted   # ← Chạy trên laptop của bạn
+    if: github.ref == 'refs/heads/main'  # ← Chỉ deploy từ main branch
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy with Docker Compose
+        run: |
+          echo "🚀 Deploying to laptop..."
+          
+          # Di chuyển vào thư mục project
+          cd /d/Kienlong/hoc_tap/assignment1-24module
+          
+          # Pull code mới
+          git pull origin main
+          
+          # Stop containers cũ
+          docker-compose down
+          
+          # Build và start containers mới
+          docker-compose up -d --build
+          
+          echo "⏳ Waiting for services to start..."
+          Start-Sleep -Seconds 30
+          
+          # Health check
+          echo "🔍 Health checking..."
+          try {
+            $response = Invoke-WebRequest -Uri "http://localhost:8090/actuator/health" -UseBasicParsing
+            if ($response.StatusCode -eq 200) {
+              echo "✅ API Gateway is healthy!"
+            } else {
+              echo "❌ API Gateway health check failed"
+              exit 1
+            }
+          } catch {
+            echo "❌ Health check failed: $_"
+            exit 1
+          }
+          
+          # Show status
+          echo "📊 Container status:"
+          docker-compose ps
+          
+          echo "📝 Recent logs:"
+          docker-compose logs --tail=10
+          
+          echo "🎉 Deployment successful!"

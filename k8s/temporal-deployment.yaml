@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: temporal
+  namespace: assignment1-24module
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: temporal
+  template:
+    metadata:
+      labels:
+        app: temporal
+    spec:
+      containers:
+      - name: temporal
+        image: temporalio/auto-setup:1.22.3
+        ports:
+        - containerPort: 7233
+        env:
+        - name: DB
+          value: "postgresql"
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_NAME
+          value: "temporal"
+        - name: DB_USER
+          value: "postgres"
+        - name: DB_PASSWORD
+          value: "12345"
+        - name: POSTGRES_SEEDS
+          value: "postgres-service"
+        - name: AUTO_SETUP
+          value: "true"
+        - name: ENABLE_ES
+          value: "false"
+        - name: SKIP_SCHEMA_SETUP
+          value: "false"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: temporal-service
+  namespace: assignment1-24module
+spec:
+  selector:
+    app: temporal
+  ports:
+  - port: 7233
+    targetPort: 7233
+  type: ClusterIP

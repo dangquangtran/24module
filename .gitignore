@@ -40,3 +40,5 @@ build/
 # Bỏ qua tất cả log files trong bất kỳ thư mục con nào tên là "logs"
 **/logs/
 **/*.log
+
+actions-runner/
