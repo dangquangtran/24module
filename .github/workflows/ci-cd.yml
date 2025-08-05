@@ -7,12 +7,8 @@ on:
     branches: [main]
 
 jobs:
-  # CI Phase - Chạy trên GitHub server
   build-and-test:
-    runs-on: ubuntu-latest  # ← Giữ nguyên GitHub server
-    strategy:
-      matrix:
-        service: [common-library, api-gateway, user-service, product-service]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -29,10 +25,16 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
-      - name: Build and Test ${{ matrix.service }}
+      - name: Build common-library first
         run: |
-          cd ${{ matrix.service }}
+          cd common-library
           mvn clean install
+
+      - name: Build and test other services
+        run: |
+          cd api-gateway && mvn clean install
+          cd ../user-service && mvn clean install
+          cd ../product-service && mvn clean install
 
   # CD Phase - Chạy trên Self-hosted Runner (laptop)
   deploy:
