@@ -42,3 +42,10 @@ build/
 **/*.log
 
 actions-runner/
+
+# Vault data
+vault-data/
+
+# Logs
+*.log
+**/logs/
